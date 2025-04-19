@@ -4,6 +4,7 @@ import spacy
 import uuid
 import json
 import os
+from extractors.named_entity_extractor import extract_entities
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -25,27 +26,8 @@ def read_root():
 
 @app.post("/analyze")
 def analyze_story(story: StoryText):
-    # Process the story text with spaCy
-    doc = nlp(story.text)
-
-    # Organize extracted entities by type
-    categorized_entities = {
-        "characters": [],
-        "locations": [],
-        "dates": [],
-        "organizations": []
-    }
-
-    # Classify entities into their respective categories
-    for ent in doc.ents:
-        if ent.label_ == "PERSON":
-            categorized_entities["characters"].append(ent.text)
-        elif ent.label_ == "GPE" or ent.label_ == "LOC":
-            categorized_entities["locations"].append(ent.text)
-        elif ent.label_ == "DATE":
-            categorized_entities["dates"].append(ent.text)
-        elif ent.label_ == "ORG":
-            categorized_entities["organizations"].append(ent.text)
+    # Use the entity extraction function from the extractors folder
+    categorized_entities = extract_entities(story.text)
 
     # Prepare the response data
     response_data = {
